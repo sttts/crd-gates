@@ -17,23 +17,29 @@ limitations under the License.
 package main
 
 import (
-	"flag"
 	"fmt"
 	"os"
 	"regexp"
 
+	"github.com/spf13/pflag"
 	"gopkg.in/yaml.v3"
 	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	kyaml "sigs.k8s.io/yaml"
 )
 
 func main() {
-	flag.Parse()
+	outputFile := pflag.StringP("output", "o", "", "Output file. If not specified, output to stdout.")
+	help := pflag.BoolP("help", "h", false, "Print help.")
+	pflag.Parse()
+	if *help {
+		pflag.Usage()
+		os.Exit(0)
+	}
 
-	if len(flag.Args()) != 1 {
+	if len(pflag.Args()) != 1 {
 		panic("Usage: crd-gates <file>")
 	}
-	bs, err := os.ReadFile(flag.Args()[0])
+	bs, err := os.ReadFile(pflag.Args()[0])
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Failed to read file: %s\n", err)
 		os.Exit(1)
@@ -49,6 +55,15 @@ func main() {
 		processDoc(doc)
 	}
 
+	out := os.Stdout
+	if *outputFile != "" {
+		out, err = os.Create(*outputFile)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Failed to create output file: %s\n", err)
+			os.Exit(1)
+		}
+		defer out.Close()
+	}
 	for _, doc := range root.Content {
 		bs, err = yaml.Marshal(doc)
 		if err != nil {
@@ -56,8 +71,8 @@ func main() {
 			os.Exit(1)
 		}
 
-		fmt.Println("---")
-		fmt.Println(string(bs))
+		fmt.Fprintln(out, "---")
+		fmt.Fprintln(out, string(bs))
 	}
 }
 

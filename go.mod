@@ -3,6 +3,7 @@ module github.com/sttts/crd-gates
 go 1.20
 
 require (
+	github.com/spf13/pflag v1.0.5
 	gopkg.in/yaml.v3 v3.0.1
 	k8s.io/apiextensions-apiserver v0.28.1
 	sigs.k8s.io/yaml v1.3.0
