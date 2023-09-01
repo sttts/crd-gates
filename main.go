@@ -64,15 +64,12 @@ func main() {
 		}
 		defer out.Close()
 	}
-	for _, doc := range root.Content {
-		bs, err = yaml.Marshal(doc)
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "Failed to marshal YAML: %s\n", err)
-			os.Exit(1)
-		}
 
+	enc := yaml.NewEncoder(out)
+	enc.SetIndent(2)
+	for _, doc := range root.Content {
 		fmt.Fprintln(out, "---")
-		fmt.Fprintln(out, string(bs))
+		enc.Encode(doc)
 	}
 }
 
