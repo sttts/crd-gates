@@ -6,19 +6,19 @@ Add feature gates to CRDs
 $ crd-gates crd.yaml
 ```
 
-It output the processed CRD manifest to stdout.
+It outputs the processed CRD manifest to stdout.
 
-It does the following transformations of schemas:
+It does the following transformation of schemas:
 
 ```yaml
 properties:
   foo:
-    description: [GATE:FeatureGateName] THIS IS AN ALPHA FIELD. This is a foo field.
+    description: [[GATE:FeatureGateName]] THIS IS AN ALPHA FIELD. This is a foo field.
 ```
 
 to
 
-```go-template
+```yaml
 properties:
   # {{- if .FeatureGateName }}
   foo:
